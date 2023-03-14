@@ -1,6 +1,6 @@
 # SFTP
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/atmoz/sftp/build.yml?logo=github) ![GitHub stars](https://img.shields.io/github/stars/atmoz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/atmoz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/atmoz/sftp?label=pulls&logo=docker)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/atmoz/sftp/build?logo=github) ![GitHub stars](https://img.shields.io/github/stars/atmoz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/atmoz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/atmoz/sftp?label=pulls&logo=docker)
 
 ![OpenSSH logo](https://raw.githubusercontent.com/atmoz/sftp/master/openssh.png "Powered by OpenSSH")
 
@@ -30,6 +30,20 @@ Easy to use SFTP ([SSH File Transfer Protocol](https://en.wikipedia.org/wiki/SSH
     own home directory, so make sure there are at least one subdirectory if you
     want them to upload files.
   - For consistent server fingerprint, mount your own host keys (i.e. `/etc/ssh/ssh_host_*`)
+
+## Using LDAP
+To use LDAP set the following environment variables:
+
+- `ENABLE_LDAP` (Value doesn't matter, just needs to be set)
+- `LDAP_BINDDN`
+- `LDAP_BINDPW`
+- `LDAP_SEARCH_BASE`
+- `LDAP_URI`
+- `LDAP_ALLOWEDGROUPS` (if set, only listed groups will be allowed access)
+
+Note: `SFTP_USERS` variable is ignored, this means additional directories are
+not created. In the users home directory (which is r/w for root only), `sftp`
+directory is created. The user will have r/w the sftp directory.
 
 # Examples
 
@@ -96,8 +110,8 @@ docker run \
     'foo:$1$0G2g0GSt$ewU0t6GXG15.0hWoOX8X9.:e:1001'
 ```
 
-Tip: you can use this Python code to generate encrypted passwords:  
-`docker run --rm python:alpine python -c "import crypt; print(crypt.crypt('YOUR_PASSWORD'))"`
+Tip: you can use [atmoz/makepasswd](https://hub.docker.com/r/atmoz/makepasswd/) to generate encrypted passwords:
+`echo -n "your-password" | docker run -i --rm atmoz/makepasswd --crypt-md5 --clearfrom=-`
 
 ## Logging in with SSH keys
 
@@ -175,6 +189,4 @@ It depends on which linux distro and version you choose (see available images at
 - [List of `openssh` packages on Alpine releases](https://pkgs.alpinelinux.org/packages?name=openssh&branch=&repo=main&arch=x86_64)
 - [List of `openssh-server` packages on Debian releases](https://packages.debian.org/search?keywords=openssh-server&searchon=names&exact=1&suite=all&section=main)
 
-# Daily builds
-
-Images are automatically built daily to get the newest version of OpenSSH provided by the package managers.
+**Note:** The time when this image was last built can delay the availability of an OpenSSH release. Since this is an automated build linked with [debian](https://hub.docker.com/_/debian/) and [alpine](https://hub.docker.com/_/alpine/) repos, the build will depend on how often they push changes (out of my control).  Typically this can take 1-5 days, but it can also take longer. You can of course make this more predictable by cloning this repo and run your own build manually.
